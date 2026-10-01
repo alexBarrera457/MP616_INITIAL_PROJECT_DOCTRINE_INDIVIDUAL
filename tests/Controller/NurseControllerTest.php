@@ -29,6 +29,50 @@ final class NurseControllerTest extends WebTestCase
         ], $nurses);
     }
   
+    public function testFindByNameReturnsNurseWhenExists(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/nurse/name/nurse1');
+
+        self::assertResponseIsSuccessful();
+        self::assertJsonStringEqualsJsonString(
+            '{"user":"nurse1"}',
+            $client->getResponse()->getContent()
+        );
+    }
+
+    public function testFindByNameIsCaseInsensitive(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/nurse/name/NURSE2');
+
+        self::assertResponseIsSuccessful();
+        self::assertJsonStringEqualsJsonString(
+            '{"user":"nurse2"}',
+            $client->getResponse()->getContent()
+        );
+    }
+
+    public function testFindByNameReturnsNotFoundWhenNameDoesNotExist(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/nurse/name/noexiste');
+
+        self::assertResponseStatusCodeSame(404);
+        self::assertJsonStringEqualsJsonString(
+            '{"success":false,"message":"Enfermera no encontrada"}',
+            $client->getResponse()->getContent()
+        );
+    }
+
+    public function testFindByNameWithBlankNameReturnsBadRequest(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/nurse/name/%20');
+
+        self::assertResponseStatusCodeSame(400);
+    }
+
     public function testLoginWithValidCredentials(): void
     {
         $client = static::createClient();
