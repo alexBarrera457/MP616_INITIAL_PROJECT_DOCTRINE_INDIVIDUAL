@@ -21,6 +21,21 @@ final class NurseRepository
 
     }
 
+    /**
+     * Busca una enfermera por nombre de usuario (sin distinguir mayúsculas/minúsculas).
+     * Devuelve null si no existe.
+     */
+    public function findByName(string $name): ?array
+    {
+        foreach (self::NURSES as $nurse) {
+            if (strcasecmp($nurse['user'], $name) === 0) {
+                return ['user' => $nurse['user']];
+            }
+        }
+
+        return null;
+    }
+
     public function validateCredentials(string $user, string $password): bool
     {
         foreach (self::NURSES as $nurse) {
