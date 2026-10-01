@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/nurse')]
 final class NurseController extends AbstractController
 {
     #[Route('/nurse', name: 'app_nurse_controller')]
@@ -37,10 +38,15 @@ final class NurseController extends AbstractController
             || !is_string($password)
             || !$nurseRepository->validateCredentials($user, $password)
         ) {
-            return $this->json(['message' => 'Credenciales incorrectas'], JsonResponse::HTTP_UNAUTHORIZED);
+            return $this->json([
+                'success' => false,
+                'message' => 'Credenciales incorrectas',
+            ], JsonResponse::HTTP_UNAUTHORIZED);
         }
 
-        return $this->json(['message' => 'Credenciales correctas']);
+        return $this->json([
+            'success' => true,
+            'message' => 'Credenciales correctas',
+        ]);
     }
 }
-
