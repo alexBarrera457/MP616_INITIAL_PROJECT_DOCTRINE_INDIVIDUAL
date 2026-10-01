@@ -4,30 +4,32 @@ namespace App\Repository;
 
 final class NurseRepository
 {
+    
+    private const NURSES = [
+        ['user' => 'nurse1', 'password' => 'nurse123'],
+        ['user' => 'nurse2', 'password' => 'nurse456'],
+    ];
+  
     public function findAll(): array
     {
-        $nurses = [
-            [
-                'user' => 'ana_torres',
-                'password' => 'demo-password-1',
+       return array_map(
+            static fn (array $nurse): array => [
+                'user' => $nurse['user'],
             ],
-            [
-                'user' => 'lucia_martin',
-                'password' => 'demo-password-2',
-            ],
-            [
-                'user' => 'carlos_ruiz',
-                'password' => 'demo-password-3',
-            ],
-            [
-                'user' => 'marta_sanchez',
-                'password' => 'demo-password-4',
-            ],
-        ];
-
-        return array_map(
-            static fn (array $nurse): array => ['user' => $nurse['user']],
-            $nurses,
+            self::NURSES
         );
+
+    }
+
+    public function validateCredentials(string $user, string $password): bool
+    {
+        foreach (self::NURSES as $nurse) {
+            if ($nurse['user'] === $user && 
+                $nurse['password'] === $password) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
