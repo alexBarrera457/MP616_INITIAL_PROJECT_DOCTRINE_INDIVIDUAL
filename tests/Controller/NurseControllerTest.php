@@ -14,6 +14,21 @@ final class NurseControllerTest extends WebTestCase
         self::assertResponseIsSuccessful();
     }
 
+    public function testGetAllReturnsOnlyNurseNames(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/index');
+
+        self::assertResponseIsSuccessful();
+
+        $nurses = json_decode($client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame([
+            ['user' => 'nurse1'],
+            ['user' => 'nurse2'],
+        ], $nurses);
+    }
+  
     public function testLoginWithValidCredentials(): void
     {
         $client = static::createClient();

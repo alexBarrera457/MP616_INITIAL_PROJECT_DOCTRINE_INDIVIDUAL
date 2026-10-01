@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class NurseController extends AbstractController
 {
-    #[Route('/nurse', name: 'app_nurse')]
+    #[Route('/nurse', name: 'app_nurse_controller')]
     public function index(): JsonResponse
     {
         return $this->json([
@@ -19,6 +19,12 @@ final class NurseController extends AbstractController
         ]);
     }
 
+    #[Route('/index', name: 'app_nurse')]
+    public function getAll(NurseRepository $nurseRepository): JsonResponse
+    {
+        return $this->json($nurseRepository->findAll());
+    }
+  
     #[Route('/login', name: 'app_nurse_login', methods: ['POST'])]
     public function login(Request $request, NurseRepository $nurseRepository): JsonResponse
     {
@@ -37,3 +43,4 @@ final class NurseController extends AbstractController
         return $this->json(['message' => 'Credenciales correctas']);
     }
 }
+
