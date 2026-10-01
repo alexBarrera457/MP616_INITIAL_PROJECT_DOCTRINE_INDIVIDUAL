@@ -13,4 +13,34 @@ final class NurseControllerTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
     }
+
+    public function testLoginWithValidCredentials(): void
+    {
+        $client = static::createClient();
+        $client->jsonRequest('POST', '/login', [
+            'user' => 'nurse1',
+            'password' => 'nurse123',
+        ]);
+
+        self::assertResponseIsSuccessful();
+        self::assertJsonStringEqualsJsonString(
+            '{"message":"Credenciales correctas"}',
+            $client->getResponse()->getContent()
+        );
+    }
+
+    public function testLoginWithInvalidCredentials(): void
+    {
+        $client = static::createClient();
+        $client->jsonRequest('POST', '/login', [
+            'user' => 'nurse1',
+            'password' => 'incorrecta',
+        ]);
+
+        self::assertResponseStatusCodeSame(401);
+        self::assertJsonStringEqualsJsonString(
+            '{"message":"Credenciales incorrectas"}',
+            $client->getResponse()->getContent()
+        );
+    }
 }
