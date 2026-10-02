@@ -26,6 +26,24 @@ final class NurseControllerTest extends WebTestCase
         self::assertSame([
             ['user' => 'nurse1'],
             ['user' => 'nurse2'],
+            ['user' => 'nurse3'],
+            ['user' => 'nurse4'],
+            ['user' => 'nurse5'],
+            ['user' => 'nurse6'],
+            ['user' => 'nurse7'],
+            ['user' => 'nurse8'],
+            ['user' => 'nurse9'],
+            ['user' => 'nurse10'],
+            ['user' => 'nurse11'],
+            ['user' => 'nurse12'],
+            ['user' => 'nurse13'],
+            ['user' => 'nurse14'],
+            ['user' => 'nurse15'],
+            ['user' => 'nurse16'],
+            ['user' => 'nurse17'],
+            ['user' => 'nurse18'],
+            ['user' => 'nurse19'],
+            ['user' => 'nurse20'],
         ], $nurses);
     }
   
@@ -78,7 +96,7 @@ final class NurseControllerTest extends WebTestCase
         $client = static::createClient();
         $client->jsonRequest('POST', '/login', [
             'user' => 'nurse1',
-            'password' => 'nurse123',
+            'password' => 'n1pass',
         ]);
 
         self::assertResponseIsSuccessful();
@@ -86,6 +104,17 @@ final class NurseControllerTest extends WebTestCase
             '{"message":"Credenciales correctas"}',
             $client->getResponse()->getContent()
         );
+    }
+
+    public function testLoginWithNewNurseCredentials(): void
+    {
+        $client = static::createClient();
+        $client->jsonRequest('POST', '/login', [
+            'user' => 'nurse3',
+            'password' => 'n3pass',
+        ]);
+
+        self::assertResponseIsSuccessful();
     }
 
     public function testLoginWithInvalidCredentials(): void
