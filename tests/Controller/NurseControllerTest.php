@@ -14,7 +14,7 @@ final class NurseControllerTest extends WebTestCase
         self::assertResponseIsSuccessful();
     }
 
-    public function testGetAllReturnsOnlyNurseNames(): void
+    public function testGetAllReturnsNurseNamesAndCredentialLists(): void
     {
         $client = static::createClient();
         $client->request('GET', '/index');
@@ -23,10 +23,13 @@ final class NurseControllerTest extends WebTestCase
 
         $nurses = json_decode($client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
-        self::assertSame([
-            ['user' => 'nurse1'],
-            ['user' => 'nurse2'],
-        ], $nurses);
+        self::assertCount(20, $nurses);
+        foreach ($nurses as $index => $nurse) {
+            self::assertSame('nurse'.($index + 1), $nurse['user']);
+            self::assertArrayHasKey('credentials', $nurse);
+            self::assertIsArray($nurse['credentials']);
+            self::assertArrayNotHasKey('password', $nurse);
+        }
     }
   
     public function testFindByNameReturnsNurseWhenExists(): void
@@ -35,10 +38,17 @@ final class NurseControllerTest extends WebTestCase
         $client->request('GET', '/nurse/name/nurse1');
 
         self::assertResponseIsSuccessful();
-        self::assertJsonStringEqualsJsonString(
-            '{"user":"nurse1"}',
-            $client->getResponse()->getContent()
-        );
+        $nurse = json_decode($client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('nurse1', $nurse['user']);
+        self::assertSame([
+            [
+                'licenseNumber' => 'RN-12345',
+                'certification' => 'Basic Life Support',
+                'issuingBody' => 'American Red Cross',
+                'expirationDate' => '2027-01-01',
+            ],
+        ], $nurse['credentials']);
+        self::assertArrayNotHasKey('password', $nurse);
     }
 
     public function testFindByNameIsCaseInsensitive(): void
@@ -47,10 +57,9 @@ final class NurseControllerTest extends WebTestCase
         $client->request('GET', '/nurse/name/NURSE2');
 
         self::assertResponseIsSuccessful();
-        self::assertJsonStringEqualsJsonString(
-            '{"user":"nurse2"}',
-            $client->getResponse()->getContent()
-        );
+        $nurse = json_decode($client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('nurse2', $nurse['user']);
+        self::assertArrayHasKey('credentials', $nurse);
     }
 
     public function testFindByNameReturnsNotFoundWhenNameDoesNotExist(): void
@@ -78,12 +87,27 @@ final class NurseControllerTest extends WebTestCase
         $client = static::createClient();
         $client->jsonRequest('POST', '/login', [
             'user' => 'nurse1',
-            'password' => 'nurse123',
+            'password' => 'n1pass',
         ]);
 
         self::assertResponseIsSuccessful();
         self::assertJsonStringEqualsJsonString(
-            '{"message":"Credenciales correctas"}',
+            '{"success":true,"message":"Credenciales correctas"}',
+            $client->getResponse()->getContent()
+        );
+    }
+
+    public function testLoginWithNewNurseCredentials(): void
+    {
+        $client = static::createClient();
+        $client->jsonRequest('POST', '/login', [
+            'user' => 'nurse3',
+            'password' => 'n3pass',
+        ]);
+
+        self::assertResponseIsSuccessful();
+        self::assertJsonStringEqualsJsonString(
+            '{"success":true,"message":"Credenciales correctas"}',
             $client->getResponse()->getContent()
         );
     }

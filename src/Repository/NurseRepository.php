@@ -2,49 +2,26 @@
 
 namespace App\Repository;
 
+use App\Service\NurseJsonDataProvider;
+
 final class NurseRepository
 {
-    
-    private const NURSES = [
-        ['user' => 'nurse1', 'password' => 'nurse123'],
-        ['user' => 'nurse2', 'password' => 'nurse456'],
-    ];
-  
-    public function findAll(): array
+    public function __construct(private readonly NurseJsonDataProvider $nurseData)
     {
-       return array_map(
-            static fn (array $nurse): array => [
-                'user' => $nurse['user'],
-            ],
-            self::NURSES
-        );
-
     }
 
-    /**
-     * Busca una enfermera por nombre de usuario (sin distinguir mayúsculas/minúsculas).
-     * Devuelve null si no existe.
-     */
+    public function findAll(): array
+    {
+        return $this->nurseData->findAll();
+    }
+
     public function findByName(string $name): ?array
     {
-        foreach (self::NURSES as $nurse) {
-            if (strcasecmp($nurse['user'], $name) === 0) {
-                return ['user' => $nurse['user']];
-            }
-        }
-
-        return null;
+        return $this->nurseData->findByName($name);
     }
 
     public function validateCredentials(string $user, string $password): bool
     {
-        foreach (self::NURSES as $nurse) {
-            if ($nurse['user'] === $user && 
-                $nurse['password'] === $password) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->nurseData->authenticate($user, $password) !== null;
     }
 }

@@ -38,14 +38,7 @@ final class NurseController extends AbstractController
             ], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        try {
-            $nurse = $nurseRepository->findByName($name);
-        } catch (\Throwable) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Error al consultar los datos',
-            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $nurse = $nurseRepository->findByName($name);
 
         if ($nurse === null) {
             return $this->json([
@@ -64,11 +57,14 @@ final class NurseController extends AbstractController
         $user = $credentials['user'] ?? null;
         $password = $credentials['password'] ?? null;
 
-        if (
-            !is_string($user)
-            || !is_string($password)
-            || !$nurseRepository->validateCredentials($user, $password)
-        ) {
+        if (!is_string($user) || !is_string($password)) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Credenciales incorrectas',
+            ], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        if (!$nurseRepository->validateCredentials($user, $password)) {
             return $this->json([
                 'success' => false,
                 'message' => 'Credenciales incorrectas',
