@@ -26,7 +26,7 @@ final class NurseController extends AbstractController
         return $this->json($nurseRepository->findAll());
     }
   
-    #[Route('/name/{name}', name: 'app_nurse_find_by_name', methods: ['GET'])]
+    #[Route('/name/{name}', name: 'app_nurse_show_name', methods: ['GET'])]
     public function findByName(string $name, NurseRepository $nurseRepository): JsonResponse
     {
         $name = trim($name);
